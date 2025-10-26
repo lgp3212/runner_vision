@@ -2,12 +2,26 @@ import psycopg2
 import math
 import utils
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+def get_db_connection():
+    """Get database connection (Supabase or local fallback)"""
+    db_url = os.getenv("SUPABASE_DB_URL")
+    if db_url:
+        return psycopg2.connect(db_url)
+    else:
+        # Fallback to local
+        return psycopg2.connect(
+            host="localhost", database="runsafe_db", user="lpietrewicz", password=""
+        )
+
 def get_area_crash_percentiles(lat: float, lng: float, radius_km: float = 1.0, attr="injuries"):
     """Calculate crash percentiles for areas similar to the query location"""
     try:
-        conn = psycopg2.connect(
-            host="localhost", database="runsafe_db", user="lpietrewicz", password=""
-        ) # TO BE CHANGED
+        conn = get_db_connection()
         cursor = conn.cursor()
         
         # create a grid of sample points around the area to get distribution
@@ -58,9 +72,7 @@ def get_crashes_near_me(
 ):
     try:
         # WIP - move this out
-        conn = psycopg2.connect(
-            host="localhost", database="runsafe_db", user="lpietrewicz", password=""
-        )
+        conn = get_db_connection()
         cursor = conn.cursor()
 
         # bounding box for query
