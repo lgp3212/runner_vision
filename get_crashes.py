@@ -1,7 +1,7 @@
 import psycopg2
 import math
 import utils
-#
+
 import os
 from dotenv import load_dotenv
 
